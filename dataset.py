@@ -69,7 +69,7 @@ def _create_dataset(
         batch_size=batch_size,
         device=device,
         repeat=False,
-        sort_key=lambda x: (len(x.src), len(x.trg)),
+        sort_key=lambda x: (len(x.src), len(x.tgt)),
         batch_size_fn=batch_size_fn,
         train=True,
         shuffle=True,
