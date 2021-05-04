@@ -85,7 +85,7 @@ def _create_dataset(
 
 def load_data():
 
-    SRC_DATA, TGT_DATA = _read_data("dataset/train.bpe.th", "train.bpe.en")
+    SRC_DATA, TGT_DATA = _read_data("dataset/train.bpe.th", "dataset/train.bpe.en")
     SRC, TGT = _create_fields()
 
     from main import batch_size_fn
