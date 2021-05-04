@@ -99,7 +99,9 @@ def run_epoch(data_iter, model, loss_compute):
 def main():
     global use_cuda
 
-    (SRC, TGT), (train) = load_data()
+    (SRC, TGT), (train) = load_data(
+        src="dataset/valid3k.bpe.th", dst="dataset/valid3k.bpe.en"
+    )
 
     print(next(train))
 
