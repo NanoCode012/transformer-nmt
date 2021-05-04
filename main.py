@@ -101,6 +101,8 @@ def main():
 
     (SRC, TGT), (train) = load_data()
 
+    print(train[0])
+
     assert False
 
     pad_idx = TGT.vocab.stoi["<blank>"]

@@ -91,7 +91,7 @@ def load_data():
     from main import batch_size_fn
 
     train = _create_dataset(
-        SRC, TGT, SRC_DATA, TGT_DATA, batch_size_fn=batch_size_fn, device="0"
+        SRC, TGT, SRC_DATA, TGT_DATA, batch_size_fn=batch_size_fn, device="cuda:0"
     )
 
     return ((SRC, TGT), (train))
