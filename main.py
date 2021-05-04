@@ -107,7 +107,7 @@ def main():
     )
 
     pad_idx = TGT.vocab.stoi["<blank>"]
-    BATCH_SIZE = 12000
+    BATCH_SIZE = 60000
     # train_iter = MyIterator(
     #     train,
     #     batch_size=BATCH_SIZE,
