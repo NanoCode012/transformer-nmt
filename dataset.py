@@ -78,7 +78,7 @@ def _create_dataset(
 
     os.remove("temp.csv")
 
-    return dataloader
+    return dataloader, (dataset if train else None)
 
 
 def load_data(train_src, train_dst, valid_src, valid_dst):
@@ -88,7 +88,7 @@ def load_data(train_src, train_dst, valid_src, valid_dst):
     SRC, TGT = _create_fields()
 
     TRAIN_SRC_DATA, TRAIN_TGT_DATA = _read_data(train_src, train_dst)
-    train = _create_dataset(
+    train, _data = _create_dataset(
         SRC,
         TGT,
         TRAIN_SRC_DATA,
@@ -99,7 +99,7 @@ def load_data(train_src, train_dst, valid_src, valid_dst):
     )
 
     VALID_SRC_DATA, VALID_TGT_DATA = _read_data(valid_src, valid_dst)
-    valid = _create_dataset(
+    valid, _ = _create_dataset(
         SRC,
         TGT,
         VALID_SRC_DATA,
@@ -109,8 +109,8 @@ def load_data(train_src, train_dst, valid_src, valid_dst):
         train=False,
     )
 
-    SRC.build_vocab(train.src)
-    TGT.build_vocab(train.trg)
+    SRC.build_vocab(_data)
+    TGT.build_vocab(_data)
 
     return ((SRC, TGT), (train, valid))
 
