@@ -103,7 +103,7 @@ def main():
         src="dataset/valid3k.bpe.th", dst="dataset/valid3k.bpe.en"
     )
 
-    print(next(train))
+    print(train)
 
     assert False
 
