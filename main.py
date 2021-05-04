@@ -100,10 +100,10 @@ def main():
     global use_cuda
 
     (SRC, TGT), (train_iter, valid_iter) = load_data(
-        train_src="dataset/valid3k.bpe.th",
-        train_dst="dataset/valid3k.bpe.en",
-        valid_src="dataset/test3k.bpe.th",
-        valid_dst="dataset/test3k.bpe.en",
+        train_src="dataset/train.bpe.th",
+        train_dst="dataset/train.bpe.en",
+        valid_src="dataset/valid3k.bpe.th",
+        valid_dst="dataset/valid3k.bpe.en",
     )
 
     pad_idx = TGT.vocab.stoi["<blank>"]
@@ -140,7 +140,7 @@ def main():
         model.src_embed[0].d_model, factor=1, warmup=400, optimizer=optimizer
     )
 
-    for epoch in range(10):
+    for epoch in range(1000):
         print("Entering epoch : %d" % epoch)
         model.train()
         run_epoch(
@@ -156,6 +156,8 @@ def main():
                 SimpleLossCompute(model.generator, criterion, None),
             )
         )
+
+        torch.save(model.state_dict(), f"model_{epoch}.pt")
 
 
 if __name__ == "__main__":
