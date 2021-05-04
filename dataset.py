@@ -1,6 +1,5 @@
 # For data loading.
 from torchtext import data, datasets
-from torchtext.legacy.data import Dataset
 from main import use_cuda
 from utils import subsequent_mask
 
