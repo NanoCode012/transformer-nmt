@@ -7,8 +7,11 @@ from utils import subsequent_mask
 def load_data():
     import spacy
 
-    spacy_th = spacy.load("th")
-    spacy_en = spacy.load("en")
+    if use_cuda:
+        spacy.prefer_gpu()
+
+    spacy_th = spacy.blank("th")
+    spacy_en = spacy.load("en_core_web_trf")
 
     def tokenize_th(text):
         return [tok.text for tok in spacy_th.tokenizer(text)]
