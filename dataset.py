@@ -53,15 +53,15 @@ def _create_dataset(
     import pandas as pd
     import os
 
-    raw_data = {"src": [line for line in SRC_DATA], "tgt": [line for line in TGT_DATA]}
-    df = pd.DataFrame(raw_data, columns=["src", "tgt"])
+    raw_data = {"src": [line for line in SRC_DATA], "trg": [line for line in TGT_DATA]}
+    df = pd.DataFrame(raw_data, columns=["src", "trg"])
 
-    mask = (df["src"].str.count(" ") < max_len) & (df["tgt"].str.count(" ") < max_len)
+    mask = (df["src"].str.count(" ") < max_len) & (df["trg"].str.count(" ") < max_len)
     df = df.loc[mask]
 
     df.to_csv("temp.csv", index=False)
 
-    data_fields = [("src", SRC), ("tgt", TGT)]
+    data_fields = [("src", SRC), ("trg", TGT)]
     train = data.TabularDataset("./temp.csv", format="csv", fields=data_fields)
 
     train_iter = MyIterator(
@@ -69,7 +69,7 @@ def _create_dataset(
         batch_size=batch_size,
         device=device,
         repeat=False,
-        sort_key=lambda x: (len(x.src), len(x.tgt)),
+        sort_key=lambda x: (len(x.src), len(x.trg)),
         batch_size_fn=batch_size_fn,
         train=True,
         shuffle=True,
