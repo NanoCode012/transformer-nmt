@@ -46,7 +46,7 @@ def _create_dataset(
     SRC_DATA,
     TGT_DATA,
     batch_size_fn,
-    max_len=50,
+    max_len=1000,
     batch_size=2000,
     device=None,
 ):
@@ -75,7 +75,7 @@ def _create_dataset(
         shuffle=True,
     )
 
-    os.remove("temp.csv")
+    # os.remove("temp.csv")
 
     SRC.build_vocab(train)
     TGT.build_vocab(train)
