@@ -47,7 +47,7 @@ def _create_dataset(
     TGT_DATA,
     batch_size_fn,
     max_len=1000,
-    batch_size=2000,
+    batch_size=14000,
     device=None,
     train=True,
 ):
