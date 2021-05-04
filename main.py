@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math, copy, time
+import os
 
 from encoder import *
 from decoder import *
@@ -140,6 +141,9 @@ def main():
         model.src_embed[0].d_model, factor=1, warmup=400, optimizer=optimizer
     )
 
+    if not os.path.exists("weights"):
+        os.mkdir("weights")
+
     for epoch in range(1000):
         print("Entering epoch : %d" % epoch)
         model.train()
@@ -157,7 +161,7 @@ def main():
             )
         )
 
-        torch.save(model.state_dict(), f"model_{epoch}.pt")
+        torch.save(model.state_dict(), f"weights/model_{epoch}.pt")
 
 
 if __name__ == "__main__":
