@@ -1,8 +1,10 @@
-import torch 
+import torch
 import torch.nn as nn
+
 
 class LabelSmoothing(nn.Module):
     "Implement label smoothing."
+
     def __init__(self, size, padding_idx, smoothing=0.0):
         super(LabelSmoothing, self).__init__()
         self.criterion = nn.KLDivLoss(size_average=False)
@@ -11,7 +13,7 @@ class LabelSmoothing(nn.Module):
         self.smoothing = smoothing
         self.size = size
         self.true_dist = None
-        
+
     def forward(self, x, target):
         assert x.size(1) == self.size
         true_dist = x.data.clone()
@@ -25,17 +27,21 @@ class LabelSmoothing(nn.Module):
         true_dist.requires_grad = False
         return self.criterion(x, true_dist)
 
+
 class SimpleLossCompute:
     "A simple loss compute and train function."
+
     def __init__(self, generator, criterion, opt=None):
         self.generator = generator
         self.criterion = criterion
         self.opt = opt
-        
+
     def __call__(self, x, y, norm):
         x = self.generator(x)
-        loss = self.criterion(x.contiguous().view(-1, x.size(-1)), 
-                              y.contiguous().view(-1)) / norm
+        loss = (
+            self.criterion(x.contiguous().view(-1, x.size(-1)), y.contiguous().view(-1))
+            / norm
+        )
         loss.backward()
         if self.opt is not None:
             self.opt.step()
