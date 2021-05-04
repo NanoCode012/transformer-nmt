@@ -99,7 +99,10 @@ def run_epoch(data_iter, model, loss_compute):
 def main():
     global use_cuda
 
-    (SRC, TGT), (train, val, test) = load_data()
+    (SRC, TGT), (train) = load_data()
+
+    assert False
+
     pad_idx = TGT.vocab.stoi["<blank>"]
     BATCH_SIZE = 12000
     train_iter = MyIterator(

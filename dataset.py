@@ -1,10 +1,18 @@
 # For data loading.
 from torchtext import data, datasets
+from torchtext.legacy.data import Dataset
 from main import use_cuda
 from utils import subsequent_mask
 
 
-def load_data():
+def _read_data(src, tgt):
+    src_data = open(src).read().strip().split("\n")
+    tgt_data = open(tgt).read().strip().split("\n")
+
+    return (src_data, tgt_data)
+
+
+def _create_fields():
     import spacy
 
     if use_cuda:
@@ -30,18 +38,64 @@ def load_data():
         pad_token=BLANK_WORD,
     )
 
-    MAX_LEN = 100
-    train, val, test = datasets.IWSLT.splits(
-        exts=(".th", ".en"),
-        fields=(SRC, TGT),
-        filter_pred=lambda x: len(vars(x)["src"]) <= MAX_LEN
-        and len(vars(x)["trg"]) <= MAX_LEN,
-    )
-    MIN_FREQ = 2
-    SRC.build_vocab(train.src, min_freq=MIN_FREQ)
-    TGT.build_vocab(train.trg, min_freq=MIN_FREQ)
+    return (SRC, TGT)
 
-    return ((SRC, TGT), (train, val, test))
+
+def _create_dataset(
+    SRC,
+    TGT,
+    SRC_DATA,
+    TGT_DATA,
+    batch_size_fn,
+    max_len=50,
+    batch_size=2000,
+    device=None,
+):
+    import pandas as pd
+    import os
+
+    raw_data = {"src": [line for line in SRC_DATA], "tgt": [line for line in TGT_DATA]}
+    df = pd.DataFrame(raw_data, columns=["src", "tgt"])
+
+    mask = (df["src"].str.count(" ") < max_len) & (df["tgt"].str.count(" ") < max_len)
+    df = df.loc[mask]
+
+    df.to_csv("temp.csv", index=False)
+
+    data_fields = [("src", SRC), ("tgt", TGT)]
+    train = data.TabularDataset("./temp.csv", format="csv", fields=data_fields)
+
+    train_iter = MyIterator(
+        train,
+        batch_size=batch_size,
+        device=device,
+        repeat=False,
+        sort_key=lambda x: (len(x.src), len(x.trg)),
+        batch_size_fn=batch_size_fn,
+        train=True,
+        shuffle=True,
+    )
+
+    os.remove("temp.csv")
+
+    SRC.build_vocab(train)
+    TGT.build_vocab(train)
+
+    return train_iter
+
+
+def load_data():
+
+    SRC_DATA, TGT_DATA = _read_data("dataset/train.bpe.th", "train.bpe.en")
+    SRC, TGT = _create_fields()
+
+    from main import batch_size_fn
+
+    train = _create_dataset(
+        SRC, TGT, SRC_DATA, TGT_DATA, batch_size_fn=batch_size_fn, device="0"
+    )
+
+    return ((SRC, TGT), (train))
 
 
 class Batch:
