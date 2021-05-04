@@ -101,7 +101,7 @@ def main():
 
     (SRC, TGT), (train) = load_data()
 
-    print(train[0])
+    print(next(train))
 
     assert False
 
