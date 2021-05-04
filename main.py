@@ -99,34 +99,33 @@ def run_epoch(data_iter, model, loss_compute):
 def main():
     global use_cuda
 
-    (SRC, TGT), (train) = load_data(
-        src="dataset/valid3k.bpe.th", dst="dataset/valid3k.bpe.en"
+    (SRC, TGT), (train_iter, valid_iter) = load_data(
+        train_src="dataset/valid3k.bpe.th",
+        train_dst="dataset/valid3k.bpe.en",
+        valid_src="dataset/test3k.bpe.th",
+        valid_dst="dataset/test3k.bpe.en",
     )
-
-    print(train)
-
-    assert False
 
     pad_idx = TGT.vocab.stoi["<blank>"]
     BATCH_SIZE = 12000
-    train_iter = MyIterator(
-        train,
-        batch_size=BATCH_SIZE,
-        device=0,
-        repeat=False,
-        sort_key=lambda x: (len(x.src), len(x.trg)),
-        batch_size_fn=batch_size_fn,
-        train=True,
-    )
-    valid_iter = MyIterator(
-        val,
-        batch_size=BATCH_SIZE,
-        device=0,
-        repeat=False,
-        sort_key=lambda x: (len(x.src), len(x.trg)),
-        batch_size_fn=batch_size_fn,
-        train=False,
-    )
+    # train_iter = MyIterator(
+    #     train,
+    #     batch_size=BATCH_SIZE,
+    #     device=0,
+    #     repeat=False,
+    #     sort_key=lambda x: (len(x.src), len(x.trg)),
+    #     batch_size_fn=batch_size_fn,
+    #     train=True,
+    # )
+    # valid_iter = MyIterator(
+    #     val,
+    #     batch_size=BATCH_SIZE,
+    #     device=0,
+    #     repeat=False,
+    #     sort_key=lambda x: (len(x.src), len(x.trg)),
+    #     batch_size_fn=batch_size_fn,
+    #     train=False,
+    # )
 
     criterion = LabelSmoothing(size=len(TGT.vocab), padding_idx=0, smoothing=0.0)
     model = make_model(len(SRC.vocab), len(TGT.vocab), N=2)

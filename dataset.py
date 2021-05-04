@@ -49,6 +49,7 @@ def _create_dataset(
     max_len=1000,
     batch_size=2000,
     device=None,
+    train=True,
 ):
     import pandas as pd
     import os
@@ -62,39 +63,56 @@ def _create_dataset(
     df.to_csv("temp.csv", index=False)
 
     data_fields = [("src", SRC), ("trg", TGT)]
-    train = data.TabularDataset("./temp.csv", format="csv", fields=data_fields)
+    dataset = data.TabularDataset("./temp.csv", format="csv", fields=data_fields)
 
-    train_iter = MyIterator(
-        train,
+    dataloader = MyIterator(
+        dataset,
         batch_size=batch_size,
         device=device,
         repeat=False,
         sort_key=lambda x: (len(x.src), len(x.trg)),
         batch_size_fn=batch_size_fn,
-        train=True,
+        train=train,
         shuffle=True,
     )
 
-    # os.remove("temp.csv")
+    os.remove("temp.csv")
 
-    SRC.build_vocab(train)
-    TGT.build_vocab(train)
-
-    return train_iter
+    return dataloader
 
 
-def load_data(src, dst):
-
-    SRC_DATA, TGT_DATA = _read_data(src, dst)
-    SRC, TGT = _create_fields()
+def load_data(train_src, train_dst, valid_src, valid_dst):
 
     from main import batch_size_fn
 
+    SRC, TGT = _create_fields()
+
+    TRAIN_SRC_DATA, TRAIN_TGT_DATA = _read_data(train_src, train_dst)
     train = _create_dataset(
-        SRC, TGT, SRC_DATA, TGT_DATA, batch_size_fn=batch_size_fn, device="cuda:0"
+        SRC,
+        TGT,
+        TRAIN_SRC_DATA,
+        TRAIN_TGT_DATA,
+        batch_size_fn=batch_size_fn,
+        device="cuda:0",
+        train=True,
     )
 
-    return ((SRC, TGT), (train))
+    VALID_SRC_DATA, VALID_TGT_DATA = _read_data(valid_src, valid_dst)
+    valid = _create_dataset(
+        SRC,
+        TGT,
+        VALID_SRC_DATA,
+        VALID_TGT_DATA,
+        batch_size_fn=batch_size_fn,
+        device="cuda:0",
+        train=False,
+    )
+
+    SRC.build_vocab(train.src)
+    TGT.build_vocab(train.trg)
+
+    return ((SRC, TGT), (train, valid))
 
 
 class Batch:
